@@ -1,13 +1,8 @@
-#!/usr/bin/env python
-# coding: utf-8
 
 # In[1]:
 
 
 import numpy as np
-
-
-# In[2]:
 
 
 import pytorch_lightning as pl
@@ -54,16 +49,8 @@ class SamenessModule(nn.Module):
 
     def forward(self, x):
         self.run_counter += 1
-        return self.l1(x.double())    # <--- Вылетает ошибка тут
+        return self.l1(x.double())
 
-
-# class Decoder(nn.Module):
-#     def __init__(self):
-#         super().__init__()
-#         self.l1 = nn.Sequential(nn.Linear(3, 64), nn.ReLU(), nn.Linear(64, 28 * 28))
-#
-#     def forward(self, x):
-#         return self.l1(x)
 
 
 class SamenessAutoEncoder(pl.LightningModule):
@@ -72,11 +59,6 @@ class SamenessAutoEncoder(pl.LightningModule):
         self.encoder = encoder
 
     def training_step(self, batch, batch_idx):
-        # training_step defines the train loop.
-        # print("\n" + "-" * 20)
-        # print(f"batch: {batch.shape}")
-        # print(f"batch: {batch}")
-        # print("-" * 20)
         batch = batch[:, 0, :]
         x, y = batch.reshape(2, len(batch), 1)
         x_hat = self.encoder(x)
@@ -179,13 +161,13 @@ class SimpleRandomDataset(Dataset):
 
 
 dataset = SimpleRandomDataset(50000, transform=transforms.ToTensor())
-train_loader = DataLoader(dataset, batch_size=10000)
+train_loader = DataLoader(dataset, batch_size=1000)
 
 # model
 autoencoder = SamenessAutoEncoder(SamenessModule())
 
 # train model
-trainer = pl.Trainer(max_epochs=250)
+trainer = pl.Trainer(max_epochs=100)
 # trainer.fit(model=autoencoder, train_dataloaders=train_loader)
 trainer.fit(model=autoencoder, train_dataloaders=train_loader)
 
@@ -215,14 +197,6 @@ with torch.no_grad():
         sum_dif += sum((x - reconstructed_x)**2)
 print(f"square sum: {(sum_dif / (index + 1) / 10).__float__()}")
 
-# In[32]:
-
-
-autoencoder.encoder.run_counter
-
-
-# In[ ]:
-
 
 n = 1000
 s = 0
@@ -234,17 +208,6 @@ with torch.no_grad():
 print(f"avarage diff: {s/c}")
 
 
-# In[ ]:
-
-
-autoencoder.encoder.run_counter
-
-
-# In[ ]:
-
-
-val = torch.tensor([[1],[2],[4],[5]])
-autoencoder.encoder(val)
 
 
 x = np.linspace(-20, 20, 1000)
