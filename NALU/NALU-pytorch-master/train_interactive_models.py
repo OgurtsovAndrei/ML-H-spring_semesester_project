@@ -6,11 +6,13 @@ import torch.nn.functional as F
 
 from models import MLP, NAC, NALU
 
+import pickle
+
 NORMALIZE = True
 NUM_LAYERS = 2
 HIDDEN_DIM = 2
 LEARNING_RATE = 1e-2
-NUM_ITERS = int(1e3)
+NUM_ITERS = int(1e5)
 RANGE = [5, 10]
 ARITHMETIC_FUNCTIONS = {
     'add': lambda x, y: x + y,
@@ -52,14 +54,8 @@ def train(model, optimizer, data, target, num_iters):
             print(f"\t{i+1}/{num_iters}: loss: {loss.item():.7f} - mea: {mea.item():.7f}")
 
 
-def test(model, data, target):
-    with torch.no_grad():
-        out = model(data)
-        return torch.abs(target - out)
-
-
 def main():
-    save_dir = './results/'
+    save_dir = './trained_models/'
 
     models = [
         MLP(
@@ -68,13 +64,6 @@ def main():
             hidden_dim=HIDDEN_DIM,
             out_dim=1,
             activation='relu6',
-        ),
-        MLP(
-            num_layers=NUM_LAYERS,
-            in_dim=2,
-            hidden_dim=HIDDEN_DIM,
-            out_dim=1,
-            activation='none',
         ),
         NAC(
             num_layers=NUM_LAYERS,
@@ -90,10 +79,8 @@ def main():
         ),
     ]
 
-    results = {}
     for fn_str, fn in ARITHMETIC_FUNCTIONS.items():
-        print(f'[*] Testing function: {fn_str}')
-        results[fn_str] = []
+        print(f'[*] Function: {fn_str}')
 
         # dataset
         X_train, y_train, X_test, y_test = generate_data(
@@ -102,37 +89,17 @@ def main():
             support=RANGE,
         )
 
-        # random model
-        random_mse = []
-        for i in range(100):
-            net = MLP(
-                num_layers=NUM_LAYERS, in_dim=2,
-                hidden_dim=HIDDEN_DIM, out_dim=1,
-                activation='relu6',
-            )
-            mse = test(net, X_test, y_test)
-            random_mse.append(mse.mean().item())
-        results[fn_str].append(np.mean(random_mse))
-
         # others
         for net in models:
-            print(f'\tTraining {net.__str__().split("(")[0]}...')
+            model_name = net.__str__().split("(")[0]
+            print(f'\tTraining {model_name}...')
             optim = torch.optim.RMSprop(net.parameters(), lr=LEARNING_RATE)
             train(net, optim, X_train, y_train, NUM_ITERS)
-            mse = test(net, X_test, y_test).mean().item()
-            results[fn_str].append(mse)
 
-    with open(save_dir + "interpolation.txt", "w") as f:
-        print(results)
-        f.write("Relu6\tNone\tNAC\tNALU\n")
-        for k, v in results.items():
-            rand = results[k][0]
-            mses = [100.0*x/rand for x in results[k][1:]]
-            print(f"rand: {rand}, mses: {mses}")
-            if NORMALIZE:
-                f.write("{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\n".format(*mses))
-            else:
-                f.write("{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\n".format(*results[k][1:]))
+            name = f"{fn_str}_{model_name}_trained"
+            f = open(f"{save_dir}{name}.obj", "wb")
+            pickle.dump(net, f)
+            f.close()
 
 
 if __name__ == '__main__':
