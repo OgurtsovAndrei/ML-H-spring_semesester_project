@@ -12,7 +12,7 @@ NORMALIZE = True
 NUM_LAYERS = 2
 HIDDEN_DIM = 2
 LEARNING_RATE = 1e-2
-NUM_ITERS = int(1e5)
+NUM_ITERS = int(1e2)
 RANGE = [5, 10]
 ARITHMETIC_FUNCTIONS = {
     'add': lambda x, y: x + y,
@@ -65,6 +65,13 @@ def main():
             out_dim=1,
             activation='relu6',
         ),
+        MLP(
+            num_layers=NUM_LAYERS,
+            in_dim=2,
+            hidden_dim=HIDDEN_DIM,
+            out_dim=1,
+            activation='none',
+        ),
         NAC(
             num_layers=NUM_LAYERS,
             in_dim=2,
@@ -96,6 +103,8 @@ def main():
             optim = torch.optim.RMSprop(net.parameters(), lr=LEARNING_RATE)
             train(net, optim, X_train, y_train, NUM_ITERS)
 
+            if model_name == "MLP" and net.activation:
+                model_name += f"_{net.activation.__str__().split('(')[0]}"
             name = f"{fn_str}_{model_name}_trained"
             f = open(f"{save_dir}{name}.obj", "wb")
             pickle.dump(net, f)
