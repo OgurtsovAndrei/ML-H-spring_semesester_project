@@ -1,13 +1,9 @@
 import pickle
-import torch
-
-import random
 import numpy as np
 
 import torch
-import torch.nn.functional as F
 
-from models import MLP, NAC, NALU
+from models import MLP
 from genereate_data import generate_data
 
 NORMALIZE = True
