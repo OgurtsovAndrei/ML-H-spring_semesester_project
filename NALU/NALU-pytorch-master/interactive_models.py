@@ -27,7 +27,8 @@ def main(model, operation, value1, value2):
         data = torch.FloatTensor([value1, value2])
         result = trained_model(data)[0]
         print(f"the result is: {result:.3f}")
-    except Exception as e: print(e)
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':

@@ -5,6 +5,7 @@ import torch
 import torch.nn.functional as F
 
 from models import MLP, NAC, NALU
+from genereate_data import generate_data
 
 import pickle
 
@@ -22,24 +23,6 @@ ARITHMETIC_FUNCTIONS = {
     'squared': lambda x, y: torch.pow(x, 2),
     'root': lambda x, y: torch.sqrt(x),
 }
-
-
-def generate_data(num_train, num_test, dim, num_sum, fn, support):
-    data = torch.FloatTensor(dim).uniform_(*support).unsqueeze_(1)
-    X, y = [], []
-    for i in range(num_train + num_test):
-        idx_a = random.sample(range(dim), num_sum)
-        idx_b = random.sample([x for x in range(dim) if x not in idx_a], num_sum)
-        a, b = data[idx_a].sum(), data[idx_b].sum()
-        X.append([a, b])
-        y.append(fn(a, b))
-    X = torch.FloatTensor(X)
-    y = torch.FloatTensor(y).unsqueeze_(1)
-    indices = list(range(num_train + num_test))
-    np.random.shuffle(indices)
-    X_train, y_train = X[indices[num_test:]], y[indices[num_test:]]
-    X_test, y_test = X[indices[:num_test]], y[indices[:num_test]]
-    return X_train, y_train, X_test, y_test
 
 
 def train(model, optimizer, data, target, num_iters):
@@ -90,8 +73,8 @@ def main():
         print(f'[*] Function: {fn_str}')
 
         # dataset
-        X_train, y_train, X_test, y_test = generate_data(
-            num_train=500, num_test=50,
+        X_train, y_train= generate_data(
+            num_data=500,
             dim=100, num_sum=5, fn=fn,
             support=RANGE,
         )
