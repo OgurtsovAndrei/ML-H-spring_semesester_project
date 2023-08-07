@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (ML-H-spring_semesester_project)" project-jdk-type="Python SDK" />
+  <component name="Black">
+    <option name="sdkUUID" value="ee03fcf0-8c2b-43c1-b4a3-86446ed1b8eb" />
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Pipenv (ML-H-spring_semesester_project)" project-jdk-type="Python SDK" />
 </project>
