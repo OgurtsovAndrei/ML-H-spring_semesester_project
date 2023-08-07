@@ -17,7 +17,7 @@ def main(model, operation, value1, value2):
     if operation not in ['add', 'sub', 'mul', 'div', 'root', 'squared']:
         raise ValueError()
 
-    save_dir = './trained_models/'
+    save_dir = 'trained_models/'
     name = f"{operation}_{model}_trained"
     print(f"opening {save_dir}{name}.obj")
     file = open(f"{save_dir}{name}.obj", "rb")

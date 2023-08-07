@@ -29,8 +29,8 @@ def test(model, data, target):
 
 
 def main():
-    save_dir = './results/'
-    models_dir = './trained_models/'
+    save_dir = 'results/'
+    models_dir = 'trained_models/'
 
     model_names = ['NAC', 'NALU', 'MLP', 'MLP_ReLU6']
 

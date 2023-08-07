@@ -35,7 +35,7 @@ def train(model, optimizer, data, target, num_iters):
 
 
 def main():
-    save_dir = './trained_models/'
+    save_dir = 'trained_models/'
 
     models = [
         MLP(
